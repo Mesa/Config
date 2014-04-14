@@ -83,6 +83,7 @@ class Config
 
             $path = substr($data, $refLength, strlen($data) - ($refLength * 2));
             $data = $this->getReference($path);
+
             return;
         }
 
@@ -170,12 +171,9 @@ class Config
      */
     public function load($fileName)
     {
-        if (empty($fileName)) {
-            throw new \BadMethodCallException("Config filename was empty");
-        }
 
         if (!file_exists($fileName)) {
-            throw new \("Config file not found [$fileName]");
+            throw new \InvalidArgumentException("Config file not found [$fileName]");
         }
 
         $newConfig = include $fileName;
@@ -183,32 +181,43 @@ class Config
         if (!is_array($newConfig)) {
             throw new \UnexpectedValueException($fileName);
         }
-        $this->addValues($newConfig);
+
+        $this->addValues($newConfig, $this->data);
 
         return true;
     }
 
     /**
-     * Merge two arrays and create new items when they are missing or overwrite it
-     * when the exist.
+     * Merge two arrays and create new items when they are missing or overwrite them when they exist.
      *
      * @param array $newValue
+     * @param array $target
      */
-    public function addValues(array &$newValue)
+    protected function addValues(array &$newValue, array &$target)
     {
-        $target = &$this->data;
-
         foreach ($newValue as $key => $value) {
             if (is_array($value)) {
                 if (!isset($target[$key])) {
                     $target[$key] = [];
                 }
-                $this->addNewValues($value, $target[$key]);
+                $this->addValues($value, $target[$key]);
+                continue;
             } elseif (is_int($key)) {
                 $target[] = $value;
-            } else {
-                $target[$key] = $value;
+                continue;
             }
+
+            $target[$key] = $value;
         }
+    }
+
+    /**
+     * Merge array into existing data and create new items when they are missing or overwrite them when they exist.
+     *
+     * @param array $array
+     */
+    public function add(array $array)
+    {
+        $this->addValues($array, $this->data);
     }
 }

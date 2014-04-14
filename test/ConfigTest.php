@@ -131,8 +131,87 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function loadFromFile()
+    public function testLoadFromFile()
     {
+        $obj = new Config();
+        $obj->load(__DIR__ . "/config.php");
 
+        $this->assertSame(
+            12345,
+            $obj->get("my.config")
+        );
+
+        $this->assertSame(
+            "with",
+            $obj->get("numbered.0")
+        );
+
+        $this->assertTrue($obj->get("numbered.obj") instanceof \stdClass);
+    }
+
+    public function testMergeArrays()
+    {
+        $obj = new Config();
+
+        $obj->set(
+            "config",
+            [
+                "first"  => 1,
+                "second" => 2,
+                "third"  => 3
+            ]
+        );
+
+        $obj->add(
+            [
+                "config" => [
+                    "third"  => "3.0",
+                    "fourth" => 4
+                ]
+            ]
+        );
+
+        $this->assertSame("3.0", $obj->get("config.third"));
+        $this->assertSame(4, $obj->get("config.fourth"));
+
+        $obj->set("config", ["one", "two", "three"]);
+        $obj->add(
+            [ "config" =>
+                ["four", "five", "six", "ten" => ["ten", "ten"]]
+            ]
+        );
+
+        $this->assertSame(
+            "one",
+            $obj->get("config.0")
+        );
+
+        $this->assertSame(
+            "four",
+            $obj->get("config.3")
+        );
+
+        $this->assertSame(
+            "ten",
+            $obj->get("config.ten.1")
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testMissingConfigFile()
+    {
+        $obj = new Config();
+        $obj->load("");
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testEmptyConfigFile()
+    {
+        $obj = new Config();
+        $obj->load(__DIR__ . "/wrongConfig.php");
     }
 }
