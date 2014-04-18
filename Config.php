@@ -1,6 +1,6 @@
 <?php
 
-namespace Commander\Core;
+namespace Mesa\Config;
 
 /**
  * Class Config
