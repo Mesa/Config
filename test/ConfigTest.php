@@ -4,7 +4,7 @@ namespace Commander\Core\test;
 
 use Commander\Core\Config;
 
-require __DIR__ . "/../Config.php";
+require __DIR__ . "/../src/Config.php";
 
 /**
  * Class ConfigTest
