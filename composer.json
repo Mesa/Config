@@ -1,9 +1,12 @@
 {
     "name": "mesa/config",
+    "license": "MIT",
     "authors": [
         {
             "name": "Daniel Langemann",
-            "email": "daniel.langemann@gmx.de"
+            "email": "daniel.langemann@gmx.de",
+            "homepage": "http://daniel.langemann.org",
+            "role": "Developer"
         }
     ],
     "require": {
